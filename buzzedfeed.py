@@ -22,7 +22,7 @@ while 1:
   except:
     seed = None
   if seed is not None:
-    tweet = mc.generateStringWithSeed(sys.argv[1])
+    tweet = mc.generateStringWithSeed(seed).title()
   else:
     tweet = mc.generateString().title()
   print tweet
