@@ -1,34 +1,39 @@
 # from Marky import marky
 from pymarkovchain import MarkovChain
 import json
-import re
-import tweepy
+import re, sys
 import string
 
-regex = re.compile('[%s]' % re.escape(string.punctuation))
-
-auth = tweepy.OAuthHandler("untwGScsHBSgfScqldjbFQ", "8ZwFR5LMaMhfBEUVlhi7ce6BI71pVy7y3y8MLITA")
-auth.set_access_token("1674196790-DRDVZ4wyKGQjsjrmxu7T54ZhJO73Nzkos8n2EVf", "F1rMCVDeb7caSVmiiaOcOm4AYbn0R7A4lGxIcnUpE")
-api = tweepy.API(auth)
-data = json.load(open("results-initial.json"))
+# read in data and clean
+data = json.load(open("listicles.json"))
 text = "\n".join([d['title'] for d in data if d is not ""]).lower()
-text = regex.sub("", text)
+regex = re.compile('[%s]' % re.escape(string.punctuation))
+text = regex.sub(" b", text)
+
+# generate MC data
 mc = MarkovChain("./markov")
 mc.generateDatabase(text)
-tweeted = False
-while not tweeted:
-  tweet = mc.generateString().title()
+f = open("potential_tweets.txt", "wb")
+
+# generate and evaluate tweets
+while 1:
+  try:
+    seed = sys.argv[1]
+  except:
+    seed = None
+  if seed is not None:
+    tweet = mc.generateStringWithSeed(sys.argv[1])
+  else:
+    tweet = mc.generateString().title()
   print tweet
   answer = raw_input("Tweet this text? (yes|no|edit) ")
   if answer == "yes":
-    api.update_status(tweet)
-    print "TWEETED: " + tweet
-    tweeted = True
+    f.write(tweet)
+    break
   elif answer == "edit":
     tweet = raw_input("Enter in the edited text: ")
-    api.update_status(tweet)
-    print "TWEETED: " + tweet
-    tweeted = True
+    f.write(tweet)
+    break
 
 
 
