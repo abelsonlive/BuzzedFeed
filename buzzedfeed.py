@@ -13,7 +13,7 @@ text = regex.sub(" b", text)
 # generate MC data
 mc = MarkovChain("./markov")
 mc.generateDatabase(text)
-f = open("potential_tweets.txt", "wb")
+f = open("potential_tweets.txt", "a")
 
 # generate and evaluate tweets
 while 1:
